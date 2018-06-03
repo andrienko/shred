@@ -1,5 +1,7 @@
 (function($){
 
+  if(!$)return;
+
   var Control = function(props){
     this.__props = props || {};
     this.__state = this.__xstate || {};
@@ -63,4 +65,4 @@
 
   window.Shred = Control;
 
-})(jQuery || Zepto);
+})(this.jQuery || this.Zepto || false);
