@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Example</title>
+  <script src="shred.js"></script>
+
+
+  <style>
+    .checkbox{
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      background: #f00;
+      transition: background-color 0.2s;
+    }
+    .checkbox.checked{
+      background: #0f0;
+    }
+
+    .radio{
+      display: block;
+    }
+    .radio .option{
+      background: #f0f;
+      height: 50px;
+      line-height: 50px;
+      padding: 0 1em;
+      display: inline-block;
+    }
+    .radio .option.checked{
+      background: #ff0;
+    }
+  </style>
+
+
+  <script>
+
+    // Creating a common class. This is not necessary, of course. Just adding common methods for its descendants.
+    var Control = Shred.extend({
+      val: function(a){
+        if(a!==undefined) return this.state('value', a);
+        return this.state('value');
+      },
+      state: {value: false}
+    });
+
+    // A class for checkbox. Extending Control class.
+    var Checkbox = Control.extend({
+      init: function(body, ctl){
+        body.className = 'checkbox';
+        body.addEventListener('click',function(){
+            ctl.val(!ctl.val()===true);
+        });
+      },
+      beforeRender: false, // beforeRender set to false will prevent clearing checkbox content on render.
+      render: function(body){
+        body.classList[['remove','add'][+this.val()]]('checked');
+      }
+    });
+
+    var Radio = Control.extend({
+      props: { items: [] },
+      init: function(body, ctl){
+        body.className = 'radio';
+        this.props.items.forEach(function(item){
+          var option = ctl.buildOption(item);
+          option.addEventListener('click', function () {
+            ctl.val(option.getAttribute('data-id'));
+          });
+          body.appendChild(option);
+        })
+      },
+      beforeRender: false, // beforeRender set to false will prevent clearing checkbox content on render.
+      buildOption: function(option){
+        var el = document.createElement('span');
+        el.classList.add('option');
+        el.setAttribute('data-id', option.id);
+        el.innerHTML = option.title;
+        return el;
+      },
+      render: function(body,ctl){
+        [].forEach.call(body.querySelectorAll('.option'), function (option) {
+          option.classList[['remove','add'][+(ctl.val()===option.getAttribute('data-id'))]]('checked');
+        });
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+      new Checkbox({title: '1'}).attach(document.body);
+      new Checkbox({title: '1'}).attach(document.body);
+      new Radio({items: [
+        {title:"Option A", id: 'a'},
+        {title:"Option С", id: 'с'},
+        {title:'Option B', id: 'b'}
+      ]}).val('a').attach(document.body);
+    });
+
+  </script>
+
+</head>
+<body></body>
+
+
+</html>
