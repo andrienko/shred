@@ -1,9 +1,9 @@
-(function(){
+(function($){
+
   var Control = function(props){
     this.__props = props || {};
     this.__state = this.__xstate || {};
-    this.__container = $('<span/>').
-    addClass('control');
+    this.__container = $('<span/>').addClass('control');
     this.__trigger('init');
   };
 
@@ -60,11 +60,7 @@
     Child.extend = Control.extend;
     return Child;
   };
-  
-  if(typeof module !== 'undefined'){
-    module.exports = Control;
-  } else {
-    window.Shred = Control;
-  }
 
-})();
+  window.Shred = Control;
+
+})(jQuery || Zepto);
