@@ -1,16 +1,17 @@
-(function(){
-  
-  var Shred = function(props){
+(function(sn,w){
+
+  var S = function(props){
     this.props = this.__xprops === undefined ? {} : this.__xprops;
     for(var prop in props) if(props.hasOwnProperty(prop)){
       this.props[prop] = props[prop];
     }
     this.__state = {};
     this.e = this.build();
+    this.e[sn] = this;
     this.___t('init');
   };
 
-  Shred.prototype = {
+  S.prototype = {
     ___t: function(what, thisArg, args){
       if(typeof this['__x'+what] === 'function') this['__x'+what].apply(thisArg || this, args || [this.e, this]);
       return this;
@@ -42,22 +43,22 @@
   };
 
   ['attach','setState'].forEach(function(w){
-    Shred.prototype['__x'+w] = function(){this.render();}
+    S.prototype['__x'+w] = function(){this.render();}
   });
 
-  Shred.extend = function(opts){
-    var Shred = this;
-    var Child = function(){ Shred.apply(this, arguments); };
-    Child.prototype = Object.create(Shred.prototype);
-    Child.prototype.construtor = Shred;
+  S.extend = function(opts){
+    var S = this;
+    var C = function(){ S.apply(this, arguments); };
+    C.prototype = Object.create(S.prototype);
+    C.prototype.construtor = S;
     for(var pmn in opts) if(opts.hasOwnProperty(pmn)){
       var val = opts[pmn];
       if(~['init','render','props','state','attach', 'beforeRender','setState'].indexOf(pmn)) pmn = '__x'+pmn;
-      Child.prototype[pmn] = val;
+      C.prototype[pmn] = val;
     };
-    Child.extend = Shred.extend;
-    return Child;
+    C.extend = S.extend;
+    return C;
   };
 
-  window.Shred = Shred;
-})();
+  w[sn] = S;
+})('Shred',this);
