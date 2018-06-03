@@ -1,47 +1,46 @@
-(function($){
-
-  if(!$)return;
+(function(){
 
   var Control = function(props){
-    this.__props = props || {};
-    this.__state = this.__xstate || {};
-    this.__container = $('<span/>').addClass('control');
-    this.__trigger('init');
+    this.props = this.__xprops === undefined ? {} : this.__xprops;
+    for(var prop in props) if(props.hasOwnProperty(prop)){
+      this.props[prop] = props[prop];
+    }
+    this.__state = {};
+    this.element = this.build();
+    this.___t('init');
   };
 
   Control.prototype = {
-    __trigger: function(what, thisArg, args){
-      if(typeof this['__x'+what] === 'function') this['__x'+what].apply(thisArg || this, args || [this.__container, this]);
+    ___t: function(what, thisArg, args){
+      if(typeof this['__x'+what] === 'function') this['__x'+what].apply(thisArg || this, args || [this.element, this]);
       return this;
     },
-    __xbeforeRender: function(){
-      this.__container.html('');
-    },
-    prop: function(propValue){
-      if(this.__props[propValue]) return this.__props[propValue];
-      else if(this.__xprops && this.__xprops[propValue]) return this.__xprops[propValue];
-      else return '';
-    },
+    __xstate: {},
     state: function(a,b){
       var l = arguments.length;
       if(l == 1){
-        return this.__state[a] || this.__xstate[a] || '';
+        var defval = this.__xstate[a];
+        var val = this.__state[a];
+        return val === undefined ? (defval === undefined ? '' : defval) : val
       } else if(l == 2){
         var o = this.__state[a];
         this.__state[a] = b;
-        return this.__trigger('setState', this, [a,b,o]);;
+        return this.___t('setState', this, [a,b,o]);;
       }
       else return this.__state;
     },
-    render: function(){
-      return this.__trigger('beforeRender').__trigger('render');
+    render: function(body){
+      return this.___t('beforeRender').___t('render');
     },
+    build: function(){ return document.createElement('span') },
+    __xbeforeRender: function(){ this.element.innerHTML = ''; },
     attach: function(element, render){
-      var target = this.target = $(element);
-      this.__container.appendTo(target);
-      return this.__trigger('attach');
+      this.target = element;
+      element.appendChild(this.element);
+      return this.___t('attach');
     }
-  }; 
+  };
+
   ['attach','setState'].forEach(function(w){
     Control.prototype['__x'+w] = function(){this.render();}
   });
@@ -64,5 +63,4 @@
   };
 
   window.Shred = Control;
-
-})(this.jQuery || this.Zepto || false);
+})();
