@@ -1,18 +1,18 @@
 (function(){
-
-  var Control = function(props){
+  
+  var Shred = function(props){
     this.props = this.__xprops === undefined ? {} : this.__xprops;
     for(var prop in props) if(props.hasOwnProperty(prop)){
       this.props[prop] = props[prop];
     }
     this.__state = {};
-    this.element = this.build();
+    this.e = this.build();
     this.___t('init');
   };
 
-  Control.prototype = {
+  Shred.prototype = {
     ___t: function(what, thisArg, args){
-      if(typeof this['__x'+what] === 'function') this['__x'+what].apply(thisArg || this, args || [this.element, this]);
+      if(typeof this['__x'+what] === 'function') this['__x'+what].apply(thisArg || this, args || [this.e, this]);
       return this;
     },
     __xstate: {},
@@ -33,34 +33,31 @@
       return this.___t('beforeRender').___t('render');
     },
     build: function(){ return document.createElement('span') },
-    __xbeforeRender: function(){ this.element.innerHTML = ''; },
+    __xbeforeRender: function(){ this.e.innerHTML = ''; },
     attach: function(element, render){
       this.target = element;
-      element.appendChild(this.element);
+      element.appendChild(this.e);
       return this.___t('attach');
     }
   };
 
   ['attach','setState'].forEach(function(w){
-    Control.prototype['__x'+w] = function(){this.render();}
+    Shred.prototype['__x'+w] = function(){this.render();}
   });
 
-  Control.extend = function(methods){
-    var Control = this;
-    var Child = function(){ Control.apply(this, arguments); };
-
-    Child.prototype = Object.create(Control.prototype);
-    Child.prototype.construtor = Control;
-    for(var method in methods) if(methods.hasOwnProperty(method)){
-      var pmn = method;
-      if(~['init','render','props','state','attach', 'beforeRender','setState'].indexOf(method)){
-        pmn = '__x'+pmn;
-      }
-      Child.prototype[pmn] = methods[method];
+  Shred.extend = function(opts){
+    var Shred = this;
+    var Child = function(){ Shred.apply(this, arguments); };
+    Child.prototype = Object.create(Shred.prototype);
+    Child.prototype.construtor = Shred;
+    for(var pmn in opts) if(opts.hasOwnProperty(pmn)){
+      var val = opts[pmn];
+      if(~['init','render','props','state','attach', 'beforeRender','setState'].indexOf(pmn)) pmn = '__x'+pmn;
+      Child.prototype[pmn] = val;
     };
-    Child.extend = Control.extend;
+    Child.extend = Shred.extend;
     return Child;
   };
 
-  window.Shred = Control;
+  window.Shred = Shred;
 })();
